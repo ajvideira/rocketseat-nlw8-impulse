@@ -1,8 +1,8 @@
 import html2canvas from 'html2canvas';
 import { Camera, CircleNotch, Trash } from 'phosphor-react';
-import { FormEvent, useState } from 'react';
+import { ButtonHTMLAttributes, FormEvent, HTMLProps, useState } from 'react';
 
-type ScreenshotButtonProps = {
+type ScreenshotButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   onScreenshotTook: (screenshot: string | null) => void;
   screenshot: string | null;
 };
@@ -10,6 +10,7 @@ type ScreenshotButtonProps = {
 export function ScreenshotButton({
   onScreenshotTook,
   screenshot,
+  ...rest
 }: ScreenshotButtonProps) {
   const [isTakingScreenshot, setIsTakingScreenshot] = useState(false);
 
@@ -26,7 +27,7 @@ export function ScreenshotButton({
   if (screenshot) {
     return (
       <button
-        className="p-1 w-10 h-10 flex items-end justify-end border-transparent text-zinc-400 rounded-md hover:text-zinc-100 transition-colors"
+        className="p-1 w-10 h-10 flex items-end justify-end border-transparent text-zinc-400 rounded-md hover:text-zinc-100 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
         type="button"
         onClick={() => onScreenshotTook(null)}
         style={{
@@ -34,6 +35,7 @@ export function ScreenshotButton({
           backgroundPosition: 'right bottom',
           backgroundSize: '100px',
         }}
+        {...rest}
       >
         <Trash weight="fill" className="w-4 h-4" />
       </button>
@@ -42,9 +44,10 @@ export function ScreenshotButton({
 
   return (
     <button
-      className="w-10 h-10 flex items-center justify-center border-transparent bg-zinc-800 rounded-md hover:bg-zinc-700 focus:outline-none focus:ring-2 focus: ring-offset-2 focus:ring-offset-zinc-900 focus:ring-brand-500"
+      className="w-10 h-10 flex items-center justify-center border-transparent bg-zinc-800 rounded-md hover:bg-zinc-700 focus:outline-none focus:ring-2 focus: ring-offset-2 focus:ring-offset-zinc-900 focus:ring-brand-500  disabled:cursor-not-allowed disabled:opacity-50"
       type="button"
       onClick={() => takeScreeenshot()}
+      {...rest}
     >
       {isTakingScreenshot ? (
         <CircleNotch className="w-6 h-6 animate-spin" />

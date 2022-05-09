@@ -1,6 +1,7 @@
-import { ArrowLeft, Camera } from 'phosphor-react';
+import { ArrowLeft, Camera, CircleNotch } from 'phosphor-react';
 import { FormEvent, useState } from 'react';
 import { FeedbackType, feedbackTypes } from '..';
+import { api } from '../../../services/api';
 import { CloseButton } from '../../CloseButton';
 import { ScreenshotButton } from '../ScreenshotButton';
 
@@ -17,12 +18,27 @@ export function FeedbackContentStep({
 }: FeedbackContentStepProps) {
   const [screenshot, setScreenshot] = useState<string | null>(null);
   const [comment, setComment] = useState('');
+  const [isSendingFeedback, setIsSendingFeedback] = useState(false);
 
   const feedbackTypeInfo = feedbackTypes[feedbackType];
 
-  function handleFeedbackSubmit(event: FormEvent) {
+  async function handleFeedbackSubmit(event: FormEvent) {
     event.preventDefault();
-    console.log({ comment, screenshot });
+
+    setIsSendingFeedback(true);
+
+    try {
+      await api.post('/feedbacks', {
+        type: feedbackType,
+        comment,
+        screenshot,
+      });
+      onFeedbackSent(true);
+    } catch (error) {
+      console.log(error);
+      setIsSendingFeedback(false);
+    }
+
     onFeedbackSent(true);
   }
 
@@ -59,13 +75,18 @@ export function FeedbackContentStep({
           <ScreenshotButton
             onScreenshotTook={setScreenshot}
             screenshot={screenshot}
+            disabled={isSendingFeedback}
           />
           <button
             className="w-full h-10 flex items-center justify-center border-transparent bg-brand-500 rounded-md text-white text-sm hover:bg-brand-300 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-zinc-900 focus:ring-brand-500 disabled:opacity-50 disabled:hover:bg-brand-500 disabled:cursor-not-allowed"
             type="submit"
-            disabled={!comment}
+            disabled={!comment || isSendingFeedback}
           >
-            Enviar Feedback
+            {isSendingFeedback ? (
+              <CircleNotch className="w-6 h-6 animate-spin" />
+            ) : (
+              'Enviar Feedback'
+            )}
           </button>
         </div>
       </form>
